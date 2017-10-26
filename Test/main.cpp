@@ -2,7 +2,7 @@
 #include "systemc.h"
 #include "SENSOR.h"
 #include "MOBILE.h"
-
+//
 #define _CRT_SECURE_NO_WARNINGS
 int sc_main(int argc, char *argv[]){
 

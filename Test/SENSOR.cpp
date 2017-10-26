@@ -1,5 +1,5 @@
 #include "SENSOR.h"
-
+//
 
 typedef int sensor_T;
 void SENSOR<sensor_T>::prc_sensor(){
