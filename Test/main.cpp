@@ -9,8 +9,8 @@ int sc_main(int argc, char *argv[]){
 	// DEFINE SIGNALS
 	sc_clock					clk_sig("clk", 4, SC_MS);
 
-	sc_signal<sc_uint<8> > randX_sig;
-	sc_signal<sc_uint<8> > randY_sig;
+	sc_signal<sc_int<16> > randX_sig;
+	sc_signal<sc_int<16> > randY_sig;
 
 
 	// CREATE SENSOR 0

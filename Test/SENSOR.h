@@ -9,8 +9,8 @@ public:
 	//	PORTS
 	sc_in<bool> clock;
 
-	sc_out<sc_uint<8> > randX;
-	sc_out<sc_uint<8> > randY;
+	sc_out<sc_int<16> > randX;
+	sc_out<sc_int<16> > randY;
 
 	void prc_sensor();
 
@@ -23,7 +23,6 @@ public:
 
 		SC_METHOD(prc_sensor);
 		sensitive << clock.pos();
-		dont_initialize();
 
 	}
 private:
