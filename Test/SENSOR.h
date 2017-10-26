@@ -9,6 +9,9 @@ public:
 	//	PORTS
 	sc_in<bool> clock;
 
+	sc_out<sc_uint<8> > randX;
+	sc_out<sc_uint<8> > randY;
+
 	void prc_sensor();
 
 	SC_HAS_PROCESS(SENSOR);
@@ -17,9 +20,6 @@ public:
 	{
 
 		cout << "CREATING SENSOR..." << "\tName: " << name << endl;
-
-
-
 
 		SC_METHOD(prc_sensor);
 		sensitive << clock.pos();

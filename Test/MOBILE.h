@@ -11,6 +11,9 @@ public:
 	//	PORTS
 	sc_in<bool> clock;
 
+	sc_in<sc_uint<8> > randX;
+	sc_in<sc_uint<8> > randY;
+
 	void prc_mobile();
 
 	SC_HAS_PROCESS(MOBILE);
