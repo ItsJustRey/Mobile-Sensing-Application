@@ -2,8 +2,8 @@
 #include "systemc.h"
 #include "SENSOR.h"
 #include "MOBILE.h"
-//
 #define _CRT_SECURE_NO_WARNINGS
+
 int sc_main(int argc, char *argv[]){
 
 	// DEFINE SIGNALS
@@ -21,7 +21,6 @@ int sc_main(int argc, char *argv[]){
 	sensor0.randX(randX_sig);
 	sensor0.randY(randY_sig);
 
-
 	// CREATE MOBILE0
 	typedef int mobile_T;
 	MOBILE<mobile_T>	mobile0("mobile0");
@@ -30,8 +29,7 @@ int sc_main(int argc, char *argv[]){
 	mobile0.randY(randY_sig);
 
 	// CONTUINUE FOR 1 SECOND
-	sc_start(1, SC_SEC);
-
+	sc_start(.35, SC_SEC);
 
 	return 0;
 }

@@ -1,7 +1,6 @@
 #include "systemc.h"
 #define _CRT_SECURE_NO_WARNINGS
 using namespace std;
-//
 
 template <class T> class SENSOR : public sc_module{
 public:
