@@ -100,5 +100,6 @@ void MOBILE<mobile_T>::print_tuple_data(){
 
 void MOBILE<mobile_T>::write_to_server(){
 
+	cout << "MOBILE " << *(_mobile_id) << " IS TRANSFERRING TO SERVER";
 
 }
