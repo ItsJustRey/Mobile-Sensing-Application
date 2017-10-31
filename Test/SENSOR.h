@@ -14,8 +14,9 @@ public:
 	void prc_sensor();
 
 	SC_HAS_PROCESS(SENSOR);
-	SENSOR(sc_module_name name) :
-		sc_module(name)
+	SENSOR(sc_module_name name, const T* sensor_id) :
+		sc_module(name), _sensor_id(sensor_id)
+
 	{
 
 		cout << "CREATING SENSOR..." << "\tName: " << name << endl;
@@ -26,5 +27,5 @@ public:
 	}
 private:
 
-
+	const T* _sensor_id;
 };

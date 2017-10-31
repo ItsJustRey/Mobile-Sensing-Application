@@ -5,24 +5,42 @@ typedef int mobile_T;
 void MOBILE<mobile_T>::prc_mobile(){
 
 	cout << "prc_mobile() called at " << sc_time_stamp().to_seconds() << endl;
-	cout << "MOBILE HAS READ X = " << randX.read() <<  " Y = " << randY.read() << endl;
+	cout << "MOBILE "<<*(_mobile_id)<<" HAS READ X = " << randX.read() <<  " Y = " << randY.read() << endl;
 
 	for (int i = 0; i < NUM_ROI; i++)
 	{
 
+		//if(imageIndex.read()==0)
 		// CHECK IF X AND Y IS WITHIN THIS REGION OF INTEREST
-		if ( ( (LEFT_BOTTOM_X[i] <= randX.read() ) && (randX.read() <= RIGHT_TOP_X[i]) ) && 
-			 ( (LEFT_BOTTOM_Y[i] <= randY.read() ) && (randY.read() <= RIGHT_TOP_Y[i]) ) 
+		if ( ( (LEFT_BOTTOM_X[i][IMAGE_INDEX] <= randX.read() ) && (randX.read() <= RIGHT_TOP_X[i][IMAGE_INDEX]) ) && 
+			 ( (LEFT_BOTTOM_Y[i][IMAGE_INDEX] <= randY.read() ) && (randY.read() <= RIGHT_TOP_Y[i][IMAGE_INDEX]) ) 
 		   )
 		{
 			cout << "X AND Y WITHIN ROI " << i+1 << endl;
 			cout << "WRITING A POSEDGE TO ROI" << i + 1 << endl;
 			ROI_INDEX_SIG[i].write(true);
 		}
-		else{
+		else {
 			cout << "WRITING A NEGEDGE TO ROI" << i + 1 << endl;
 			ROI_INDEX_SIG[i].write(false);
 		}
+
+		//else if(imageIndex.read()==1)
+		//// CHECK IF X AND Y IS WITHIN THIS REGION OF INTEREST
+		//if (((LEFT_BOTTOM_X[i][IMAGE_INDEX+1] <= randX.read()) && (randX.read() <= RIGHT_TOP_X[i][IMAGE_INDEX+1])) &&
+		//	((LEFT_BOTTOM_Y[i][IMAGE_INDEX+1] <= randY.read()) && (randY.read() <= RIGHT_TOP_Y[i][IMAGE_INDEX+1]))
+		//	)
+		//{
+		//	cout << "X AND Y WITHIN ROI " << i + 1 << endl;
+		//	cout << "WRITING A POSEDGE TO ROI" << i + 1 << endl;
+		//	ROI_INDEX_SIG[i].write(true);
+		//}
+		//else {
+		//	cout << "WRITING A NEGEDGE TO ROI" << i + 1 << endl;
+		//	ROI_INDEX_SIG[i].write(false);
+		//}
+
+
 	}
 
 	cout << endl;
@@ -47,18 +65,25 @@ void MOBILE<mobile_T>::detect_tuple(){
 			ROI_TIME_END[i] = sc_time_stamp().to_seconds();
 
 			// UPDATE tuple ARRAY
-			TUPLE_ARRAY[tuple_count][0] = i + 1;
-			TUPLE_ARRAY[tuple_count][1] = ROI_TIME_START[i];
-			TUPLE_ARRAY[tuple_count][2] = ROI_TIME_END[i];
-			tuple_count++;
-			cout << "tuple COUNT " << tuple_count << endl;
+			if (tuple_count <= 19)
+			{
+				TUPLE_ARRAY[tuple_count][0] = i + 1;
+				TUPLE_ARRAY[tuple_count][1] = ROI_TIME_START[i];
+				TUPLE_ARRAY[tuple_count][2] = ROI_TIME_END[i];
+				tuple_count++;
+				cout << "Tuple COUNT " << tuple_count << endl;
+			}
+			else
+			{
+				packet_signal.write(1);
+			}
 		}
 	}
 }
 
 void MOBILE<mobile_T>::print_tuple_data(){
 
-	cout << endl << "======tuple ARRAY=======" << endl;
+	cout << endl << "======Tuple ARRAY in Mobile "<<*(_mobile_id)<<"=======" << endl;
 	cout << "|ROI\t|START\t|END\t|" << endl;
 	cout << "==============================" << endl;
 	for (int i = 0; i < PACKET_SIZE; i++){
@@ -70,4 +95,10 @@ void MOBILE<mobile_T>::print_tuple_data(){
 		cout << endl;
 	}
 	cout << "=========================================" << endl;
+}
+
+
+void MOBILE<mobile_T>::write_to_server(){
+
+
 }
