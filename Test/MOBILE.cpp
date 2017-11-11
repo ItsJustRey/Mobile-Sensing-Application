@@ -6,7 +6,7 @@ void MOBILE<mobile_T>::prc_mobile(){
 
 	
 	
-	if (!transmitting){
+	if (!transmitting && packet_full.read() == 0){
 		cout << "MOBILE " << *(_mobile_id) << " HAS READ X = " << randX.read() << " Y = " << randY.read() << " at " << sc_time_stamp().to_seconds()  << endl;
 		for (int i = 0; i < NUM_ROI; i++)
 		{
@@ -90,12 +90,12 @@ void MOBILE<mobile_T>::detect_tuple(){
 // SC_THREAD triggered on packet_full
 void MOBILE<mobile_T>::prc_request_to_server(){
 	cout << "MOBILE " << *(_mobile_id) << " prc_request_to_server() triggered at " << sc_time_stamp().to_seconds() << endl;
-	//while (!transmitting)
+	
 	while (true)
 	{
 		cout << " INSIDE MOBILE " << *(_mobile_id) << " prc_request_to_server() WHILE LOOP at " << sc_time_stamp().to_seconds() << endl;
 		// SERVER IS FREE AND PACKET IS FULL
-		if (free_in.read() == 1 && packet_full.read() ==1)
+		if (free_in.read() == 1 && packet_full.read() ==1 && tuple_counter == PACKET_SIZE)
 		{
 			cout << "  MOBILE " << *(_mobile_id) << " SEES THAT SERVER IS FREE at " << sc_time_stamp().to_seconds() << endl;
 
@@ -133,8 +133,6 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 					}
 				}
 
-
-				//break;
 			}
 			else
 			{
@@ -142,41 +140,12 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 				wait(8, SC_MS);
 			}
 		}
-		else{
+		else
+		{
 			wait(8, SC_MS);
 		}
 	}
 }
-
-
-// SC_METHOD triggered on done_in
-//void MOBILE<mobile_T>::transmission_done(){
-//
-//	if (done_in.read() == 1)
-//	{
-//		cout << "MOBILE " << *(_mobile_id) << " IS DONE TRANSMITTING" << endl;
-//		
-//		packet_counter++;
-//		transmitting = false;
-//		packet_request_out.write(0);
-//		start_transmission_out.write(0);
-//		tuple_counter = 0;
-//		for (int i = 0; i < PACKET_SIZE; i++){
-//
-//			for (int j = 0; j < tuple_NUM_COLUMNS; j++){
-//
-//				TUPLE_ARRAY[i][j] = 0;
-//
-//			}
-//		}
-//
-//	}
-//
-//
-//
-//
-//}
-
 
 
 void MOBILE<mobile_T>::print_mobile(){

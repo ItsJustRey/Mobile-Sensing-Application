@@ -69,70 +69,6 @@ void SERVER<server_T>::prc_receive_from_mobile(){
 
 }
 
-//// SC_THREAD triggered for each mobile's start_packet_transmission_in[i]
-//void SERVER<server_T>::prc_start_transmission(){
-//	
-//	cout << "SERVER prc_start_transmission() triggered" << endl;
-//	
-//	while (transmitting.read() == false)
-//	{
-//		cout << " INSIDE SERVER " << "prc_start_transmission() WHILE LOOP" << endl;
-//		for (int i = 0; i < NUM_MOBILES; i++)
-//		{
-//					if (start_transmission_in[i].read() == 1)
-//					{
-//						
-//
-//						//transmitting = true;
-//						transmitting.write(1);
-//						cout << "   SERVER STARTING TRANSMISSION for MOBILE " << i << endl;
-//						wait(8, SC_MS);
-//						cout << "   SERVER DONE TRANSMISSION for MOBILE " << i << endl;
-//
-//						// PHASE 3 PLACEHOLDER
-//						// PHASE 3 PLACEHOLDER
-//						// PHASE 3 PLACEHOLDER 
-//						// PHASE 3 PLACEHOLDER
-//
-//
-//						cout << "   SERVER TELLS MOBILE " << i << " THAT IS DONE TRANSMITTING" << endl;
-//						done_out[i].write(1);
-//						packet_permission_out[i].write(0);
-//
-//						for (int j = 0; j < NUM_MOBILES; j++)
-//						{
-//							free_out[j].write(1);
-//						}
-//						server_is_free.write(1);
-//						//cout << " BREAKING SERVER " << "prc_start_transmission() WHILE LOOP for MOBILE " << i << endl;
-//						//break;
-//						transmitting.write(0);
-//
-//					}
-//					else{
-//						wait(8, SC_MS);
-//					}
-//				}
-//				
-//					//else{
-//					//	cout << "   SERVER NOT WAITING DURING TRANSMISSION" << endl;
-//					//	wait(8, SC_MS);
-//					//}
-//			/*else
-//			{
-//			
-//			done_out[i].write(0);
-//
-//		
-//			}*/
-//			
-//
-//	}
-//
-//		cout << "LEAVING SERVER " << "prc_start_transmission() "<< endl;
-//}	
-
-
 // SC_THREAD(prc_transmit);
 //sensitive << transmitting.posedge_event();
 void SERVER<server_T>::prc_transmit(){
@@ -143,7 +79,7 @@ void SERVER<server_T>::prc_transmit(){
 		if (is_transmitting == true){
 			
 			cout << "   SERVER STARTING TRANSMISSION for MOBILE  at " << sc_time_stamp().to_seconds() << endl;
-			wait(24, SC_MS);
+			wait(16, SC_MS);
 			cout << "   SERVER DONE TRANSMISSION for MOBILE  at " << sc_time_stamp().to_seconds() << endl;
 			is_transmitting = false;
 			for (int i = 0; i < NUM_MOBILES; i++)
@@ -162,9 +98,6 @@ void SERVER<server_T>::prc_transmit(){
 
 
 		}
-		
-		
-
 	}
 	cout << "LEAVING SERVER transmitting() at " << sc_time_stamp().to_seconds() << endl;
 
