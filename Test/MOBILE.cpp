@@ -95,7 +95,7 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 	{
 		cout << " INSIDE MOBILE " << *(_mobile_id) << " prc_request_to_server() WHILE LOOP at " << sc_time_stamp().to_seconds() << endl;
 		// SERVER IS FREE AND PACKET IS FULL
-		if (free_in.read() == 1)
+		if (free_in.read() == 1 && packet_full.read() ==1)
 		{
 			cout << "  MOBILE " << *(_mobile_id) << " SEES THAT SERVER IS FREE at " << sc_time_stamp().to_seconds() << endl;
 
@@ -107,7 +107,7 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 				
 			}
 			
-			if (packet_permission_in.read() == 1)
+			if (packet_permission_in.read() == 1 && transmitting == false)
 			{
 				cout << "     PACKET PERMISSION  GRANTED to MOBILE " << *(_mobile_id) << " at " << sc_time_stamp().to_seconds() << endl;
 				cout << "     MOBILE " << *(_mobile_id) << " STARTING TRANSMISSION at " << sc_time_stamp().to_seconds() << endl;
@@ -115,6 +115,9 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 				start_transmission_out.write(1);
 				wait(8, SC_MS);
 				cout << "     MOBILE " << *(_mobile_id) << " DONE TRANSMISSION! at " << sc_time_stamp().to_seconds() << endl;
+
+
+
 				packet_counter++;
 				transmitting = false;
 				packet_request_out.write(0);
@@ -129,6 +132,8 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 
 					}
 				}
+
+
 				//break;
 			}
 			else

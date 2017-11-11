@@ -100,7 +100,7 @@ int sc_main(int argc, char *argv[]){
 
 
 	// CONTUINUE FOR 1 SECOND
-	sc_start(.30, SC_SEC);
+	sc_start(1, SC_SEC);
 
 	return 0;
 }
