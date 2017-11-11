@@ -3,7 +3,7 @@
 using namespace std;
 const int NUM_MOBILES = 3;
 const int MAX_TUPPLE_SIZE = 10;
-const int SERVER_ARRAY_NUM_COLUMNS = 4;
+const int SERVER_ARRAY_NUM_COLUMNS = 6;
 
 template <class T> class SERVER : public sc_module{
 public:
@@ -18,17 +18,18 @@ public:
 
 
 	sc_signal<bool> server_is_free;
-
+	sc_signal<bool> transmitting;
 	sc_int<8>  server_array[NUM_MOBILES][SERVER_ARRAY_NUM_COLUMNS];	// SERVER DATA STRUCTURE 
-
+	bool is_transmitting;
 
 
 	//double TUPPLE_ARRAY[MAX_TUPPLE_SIZE][NUM_MOBILES * 3];			// TUPLE DATA STRUCTURE
-
+	
 
 	void prc_server();
 	void prc_receive_from_mobile();
 	void prc_start_transmission();
+	void prc_transmit();
 	void print_server();
 
 	SC_HAS_PROCESS(SERVER);
@@ -36,6 +37,7 @@ public:
 		sc_module(name)
 
 	{
+		is_transmitting = false;
 		cout << "CREATING SERVER..." << "\tName: " << name << endl;
 
 		SC_METHOD(prc_server);
@@ -54,13 +56,19 @@ public:
 		}
 		dont_initialize();
 
-		SC_THREAD(prc_start_transmission);
-		for (int i = 0; i < NUM_MOBILES; i++)
-		{
-			sensitive << start_transmission_in[i].pos();
-		}
+		//SC_THREAD(prc_start_transmission);
+		////SC_METHOD(prc_start_transmission);
+		//for (int i = 0; i < NUM_MOBILES; i++)
+		//{
+		//	sensitive << start_transmission_in[i].pos();
+		//}
+		//dont_initialize();
+	
+		//SC_CTHREAD(prc_transmit, transmitting)
+		SC_THREAD(prc_transmit);
+		//SC_METHOD(prc_transmit);
+		sensitive << transmitting.posedge_event();
 		dont_initialize();
-
 
 		SC_METHOD(print_server);
 		sensitive << clock.pos();

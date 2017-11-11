@@ -7,8 +7,9 @@ typedef int sensor_T;
 void SENSOR<sensor_T>::prc_sensor(){
 
 	cout << endl;
-	cout << endl;
-	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	cout << "|\t\t\t\t\t" << sc_time_stamp().to_seconds() << "s\t\t\t\t\t|" << endl;
+	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
 	//cout << "prc_sensor"<<*(_sensor_id)<< "() called at " << sc_time_stamp().to_seconds() << endl;
 	//srand(time(NULL));
 	int x = rand() % 1023;
