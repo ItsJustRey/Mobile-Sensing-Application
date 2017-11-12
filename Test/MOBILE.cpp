@@ -7,14 +7,22 @@ void MOBILE<mobile_T>::prc_mobile(){
 	
 	
 	if (!transmitting && packet_full.read() == 0){
-		cout << "MOBILE " << *(_mobile_id) << " HAS READ X = " << randX.read() << " Y = " << randY.read() << " at " << sc_time_stamp().to_seconds()  << endl;
+
+		
+		if (sc_time_stamp().to_seconds() < 5.00)
+		{
+			currentImageIndex = 0;
+		}
+		else{
+			currentImageIndex = 1;
+		}
+
+		cout << "MOBILE " << *(_mobile_id) << " HAS READ X = " << randX.read() << " Y = " << randY.read() << " at " << sc_time_stamp().to_seconds() << " from IMAGE " << currentImageIndex << endl;
 		for (int i = 0; i < NUM_ROI; i++)
 		{
-
-			//if(imageIndex.read()==0)
 			// CHECK IF X AND Y IS WITHIN THIS REGION OF INTEREST
-			if (((LEFT_BOTTOM_X[i][IMAGE_INDEX_0] <= randX.read()) && (randX.read() <= RIGHT_TOP_X[i][IMAGE_INDEX_0])) &&
-				((LEFT_BOTTOM_Y[i][IMAGE_INDEX_0] <= randY.read()) && (randY.read() <= RIGHT_TOP_Y[i][IMAGE_INDEX_0]))
+			if (((LEFT_BOTTOM_X[i][currentImageIndex] <= randX.read()) && (randX.read() <= RIGHT_TOP_X[i][currentImageIndex])) &&
+				((LEFT_BOTTOM_Y[i][currentImageIndex] <= randY.read()) && (randY.read() <= RIGHT_TOP_Y[i][currentImageIndex]))
 				)
 			{
 				cout << "X AND Y WITHIN ROI " << i + 1 << endl;
@@ -26,25 +34,9 @@ void MOBILE<mobile_T>::prc_mobile(){
 				ROI_INDEX_SIG[i].write(false);
 			}
 
-			//else if(imageIndex.read()==1)
-			//// CHECK IF X AND Y IS WITHIN THIS REGION OF INTEREST
-			//if (((LEFT_BOTTOM_X[i][IMAGE_INDEX+1] <= randX.read()) && (randX.read() <= RIGHT_TOP_X[i][IMAGE_INDEX+1])) &&
-			//	((LEFT_BOTTOM_Y[i][IMAGE_INDEX+1] <= randY.read()) && (randY.read() <= RIGHT_TOP_Y[i][IMAGE_INDEX+1]))
-			//	)
-			//{
-			//	cout << "X AND Y WITHIN ROI " << i + 1 << endl;
-			//	cout << "WRITING A POSEDGE TO ROI" << i + 1 << endl;
-			//	ROI_INDEX_SIG[i].write(true);
-			//}
-			//else {
-			//	cout << "WRITING A NEGEDGE TO ROI" << i + 1 << endl;
-			//	ROI_INDEX_SIG[i].write(false);
-			//}
 		}
 
 	}
-	cout << endl;
-	cout << endl;
 }
 
 
@@ -89,11 +81,11 @@ void MOBILE<mobile_T>::detect_tuple(){
 
 // SC_THREAD triggered on packet_full
 void MOBILE<mobile_T>::prc_request_to_server(){
-	cout << "MOBILE " << *(_mobile_id) << " prc_request_to_server() triggered at " << sc_time_stamp().to_seconds() << endl;
+	//cout << "MOBILE " << *(_mobile_id) << " prc_request_to_server() triggered at " << sc_time_stamp().to_seconds() << endl;
 	
 	while (true)
 	{
-		cout << " INSIDE MOBILE " << *(_mobile_id) << " prc_request_to_server() WHILE LOOP at " << sc_time_stamp().to_seconds() << endl;
+		//cout << " INSIDE MOBILE " << *(_mobile_id) << " prc_request_to_server() WHILE LOOP at " << sc_time_stamp().to_seconds() << endl;
 		// SERVER IS FREE AND PACKET IS FULL
 		if (free_in.read() == 1 && packet_full.read() ==1 && tuple_counter == PACKET_SIZE)
 		{
@@ -149,7 +141,7 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 
 
 void MOBILE<mobile_T>::print_mobile(){
-	//cout << "SIMULATION TIME:\t" << sc_time_stamp().to_seconds() << "s" << endl;
+
 	cout << "=================================================" << endl;
 	cout << "|\t\tMOBILE " << *(_mobile_id) << " at " << sc_time_stamp().to_seconds() << "\t\t| " << endl;
 	cout << "=================================================" << endl;
@@ -162,7 +154,6 @@ void MOBILE<mobile_T>::print_mobile(){
 	cout << "| PACKET REQ:    \t" << packet_request_out.read() << "\t\t\t|" << endl;
 	cout << "| PACKET PERM:   \t" << packet_permission_in.read() << "\t\t\t|" << endl;
 	cout << "| START TRANSM:  \t" << start_transmission_out.read() << "\t\t\t|" << endl;
-	//cout << "| DONE:          \t" << done_in.read() << "\t\t\t|" << endl;
 	cout << "=================================================" << endl;
 
 

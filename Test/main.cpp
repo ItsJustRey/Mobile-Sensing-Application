@@ -17,8 +17,6 @@ int sc_main(int argc, char *argv[]){
 	sc_signal<bool>			packet_request_sig[NUM_MOBILE];				// SERVER[i] <-- MOBILE[i]
 	sc_signal<bool>			packet_permission_sig[NUM_MOBILE];			// SERVER[i] --> MOBILE[i]
 	sc_signal<bool>			start_transmission_sig[NUM_MOBILES];		// SERVER[i] <-- MOBILE[i]
-	
-	sc_signal<bool>			 done_sig[NUM_MOBILE];						// SERVER[i] --> MOBILE[i]
 
 	// CREATE SENSOR 0
 	typedef int sensor0_T;
@@ -56,7 +54,6 @@ int sc_main(int argc, char *argv[]){
 		server.packet_request_in[i](packet_request_sig[i]);			// SERVER[i] <-- MOBILE[i]
 		server.packet_permission_out[i](packet_permission_sig[i]);	// SERVER[i] --> MOBILE[i]
 		server.start_transmission_in[i](start_transmission_sig[i]);	// SERVER[i] <-- MOBILE[i]
-		server.done_out[i](done_sig[i]);							// SERVER[i] --> MOBILE[i]
 	}
 
 	// CREATE MOBILE 0
@@ -67,10 +64,9 @@ int sc_main(int argc, char *argv[]){
 	mobile0.randX(randX_sig[0]);
 	mobile0.randY(randY_sig[0]);
 	mobile0.free_in(free_sig[0]);								// SERVER[i] --> MOBILE[i]
-	mobile0.packet_request_out(packet_request_sig[0]);				// SERVER[i] <-- MOBILE[i]
+	mobile0.packet_request_out(packet_request_sig[0]);			// SERVER[i] <-- MOBILE[i]
 	mobile0.packet_permission_in(packet_permission_sig[0]);		// SERVER[i] --> MOBILE[i]
 	mobile0.start_transmission_out(start_transmission_sig[0]);	// SERVER[i] <-- MOBILE[i]
-	mobile0.done_in(done_sig[0]);								// SERVER[i] --> MOBILE[i]
 	// CREATE MOBILE 1
 	typedef int mobile1_T;
 	const mobile1_T mobile1_id = 1;
@@ -79,10 +75,10 @@ int sc_main(int argc, char *argv[]){
 	mobile1.randX(randX_sig[1]);
 	mobile1.randY(randY_sig[1]);
 	mobile1.free_in(free_sig[1]);								// SERVER[i] --> MOBILE[i]
-	mobile1.packet_request_out(packet_request_sig[1]);				// SERVER[i] <-- MOBILE[i]
+	mobile1.packet_request_out(packet_request_sig[1]);			// SERVER[i] <-- MOBILE[i]
 	mobile1.packet_permission_in(packet_permission_sig[1]);		// SERVER[i] --> MOBILE[i]
 	mobile1.start_transmission_out(start_transmission_sig[1]);	// SERVER[i] <-- MOBILE[i]
-	mobile1.done_in(done_sig[1]);								// SERVER[i] --> MOBILE[i]
+
 	// CREATE MOBILE 2
 	typedef int mobile2_T;
 	const mobile2_T mobile2_id = 2;
@@ -91,16 +87,12 @@ int sc_main(int argc, char *argv[]){
 	mobile2.randX(randX_sig[2]);
 	mobile2.randY(randY_sig[2]);
 	mobile2.free_in(free_sig[2]);								// SERVER[i] --> MOBILE[i]
-	mobile2.packet_request_out(packet_request_sig[2]);				// SERVER[i] <-- MOBILE[i]
+	mobile2.packet_request_out(packet_request_sig[2]);			// SERVER[i] <-- MOBILE[i]
 	mobile2.packet_permission_in(packet_permission_sig[2]);		// SERVER[i] --> MOBILE[i]
 	mobile2.start_transmission_out(start_transmission_sig[2]);	// SERVER[i] <-- MOBILE[i]
-	mobile2.done_in(done_sig[2]);								// SERVER[i] --> MOBILE[i]
 	
-
-
-
-	// CONTUINUE FOR 1 SECOND
-	sc_start(.50, SC_SEC);
+	// CONTUINUE FOR 10 SECOND
+	sc_start(10.5, SC_SEC);
 
 	return 0;
 }

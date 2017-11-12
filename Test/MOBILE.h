@@ -4,14 +4,13 @@ using namespace std;
 
 const int NUM_ROI = 5;
 const int tuple_NUM_COLUMNS = 3;
-const int PACKET_SIZE = 10;
+const int PACKET_SIZE = 20;
 const int NUM_IMAGES = 2;
 const int IMAGE_INDEX_0 = 0;
 const int IMAGE_INDEX_1 = 1;
 
 template <class T> class MOBILE : public sc_module{
 public:
-
 	//PORTS
 	sc_in<bool> clock;
 	sc_in<sc_int<16> > randX;
@@ -19,12 +18,9 @@ public:
 
 	sc_in<bool> free_in;						// SERVER --> MOBILE[i]
 	sc_signal<bool> packet_full;
-	sc_out<bool> packet_request_out;				// SERVER[i] <-- MOBILE[i]
+	sc_out<bool> packet_request_out;			// SERVER[i] <-- MOBILE[i]
 	sc_in<bool> packet_permission_in;			// SERVER[i] --> MOBILE[i]
-	sc_out<bool> start_transmission_out;	// SERVER[i] <-- MOBILE[i]
-	sc_in<bool> done_in;						// SERVER[i] --> MOBILE[i]
-
-	
+	sc_out<bool> start_transmission_out;		// SERVER[i] <-- MOBILE[i]
 
 	sc_int<16>  LEFT_BOTTOM_X[NUM_ROI][NUM_IMAGES];
 	sc_int<16>  LEFT_BOTTOM_Y[NUM_ROI][NUM_IMAGES];
@@ -34,13 +30,13 @@ public:
 	sc_signal<bool> ROI_INDEX_SIG[NUM_ROI];					// SIGNAL THAT INDICATES IF X AND Y ARE WITHIN AN ROI
 	
 	double  TUPLE_ARRAY[PACKET_SIZE][tuple_NUM_COLUMNS];	// TUPLE DATA STRUCTURE
-	double	ROI_TIME_START[NUM_ROI];							// ARRAY TO HOLD EACH TUPLE's START TIME
+	double	ROI_TIME_START[NUM_ROI];						// ARRAY TO HOLD EACH TUPLE's START TIME
 	double	ROI_TIME_END[NUM_ROI];							// ARRAY TO HOLD EACH TUPLE's END TIME
 
+	int currentImageIndex;
 	int tuple_counter;										// NUMBER OF TUPLES
 	int packet_counter;										// NUMBER OF PACKETS
 	bool transmitting;
-
 
 	void prc_mobile();
 	void detect_tuple();	
@@ -54,7 +50,7 @@ public:
 	{
 
 		cout << "CREATING MOBILE..." << "\tName: " << name << endl;
-
+		currentImageIndex = 0;
 		tuple_counter = 0;
 		packet_counter = 0;
 		transmitting = false;

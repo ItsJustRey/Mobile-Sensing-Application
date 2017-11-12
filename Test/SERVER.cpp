@@ -4,37 +4,15 @@
 
 typedef int server_T;
 
-void SERVER<server_T>::prc_server(){
-
-
-	/*for (int i = 0; i < NUM_MOBILES; i++)
-	{
-		if (packet_request_in[i].read() == 1)
-		{
-			server_is_free.write(1);
-			
-		}
-		else{
-			server_is_free.write(0);
-			break;
-		}
-	}*/
-
-
-	
-		
-
-}
-
 // SC_METHOD triggered for each mobile's packet_request_in[i]
 void SERVER<server_T>::prc_receive_from_mobile(){
-	cout << "SERVER prc_receive_from_mobile() triggered at " << sc_time_stamp().to_seconds() << endl;
+	//cout << "SERVER prc_receive_from_mobile() triggered at " << sc_time_stamp().to_seconds() << endl;
 	for (int i = 0; i < NUM_MOBILES; i++)
 	{
 		
 		if (packet_request_in[i].read() == 1 && server_is_free.read() == 1 && free_out[i].read() ==1)
 		{
-			cout << " SERVER IS GRANTING PERMISSION TO MOBILE " << i << " at " << sc_time_stamp().to_seconds() << endl;
+			cout << " SERVER IS GIVING PERMISSION TO MOBILE " << i << " at " << sc_time_stamp().to_seconds() << endl;
 		
 			transmitting.write(1);
 			is_transmitting = true;
@@ -48,20 +26,19 @@ void SERVER<server_T>::prc_receive_from_mobile(){
 				// TELL OTHER MOBILES THAT THE SERVER IS OCCUPIED
 				if (i != j)
 				{
-					cout << " SERVER IS TELLING MOBILE " << j << " DAT IT IZ NOT FREE at " << sc_time_stamp().to_seconds() << endl;
+					cout << " SERVER IS TELLING MOBILE " << j << " THAT IT IS NOT FREE at " << sc_time_stamp().to_seconds() << endl;
 					free_out[j].write(0);
 
 				}
 
 			}
-			cout << " SERVER IS BREKAING OUT OF prc_receive_from_mobile() " << i << " at " << sc_time_stamp().to_seconds() << endl;
+			//cout << " SERVER IS BREKAING OUT OF prc_receive_from_mobile() " << i << " at " << sc_time_stamp().to_seconds() << endl;
 			break;
 		}
 		else{
-			cout << "SERVER SAID NAW PERMISSION TO MOBILE " << i << " at " << sc_time_stamp().to_seconds() << endl;
+			cout << "SERVER DID NOT GRANT PERMISSION TO MOBILE " << i << " at " << sc_time_stamp().to_seconds() << endl;
 			packet_permission_out[i].write(0);
 			server_is_free.write(1);
-			//free_out[i].write(1);
 		}
 
 	}
@@ -72,10 +49,10 @@ void SERVER<server_T>::prc_receive_from_mobile(){
 // SC_THREAD(prc_transmit);
 //sensitive << transmitting.posedge_event();
 void SERVER<server_T>::prc_transmit(){
-	cout << "SERVER transmitting() triggered at " << sc_time_stamp().to_seconds() << endl;
+	//cout << "SERVER transmitting() triggered at " << sc_time_stamp().to_seconds() << endl;
 
 	while (true){
-		cout << " INSIDE SERVER transmitting() triggered WHILE LOOP at " << sc_time_stamp().to_seconds() << endl;
+		//cout << " INSIDE SERVER transmitting() triggered WHILE LOOP at " << sc_time_stamp().to_seconds() << endl;
 		if (is_transmitting == true){
 			
 			cout << "   SERVER STARTING TRANSMISSION for MOBILE  at " << sc_time_stamp().to_seconds() << endl;
@@ -99,34 +76,33 @@ void SERVER<server_T>::prc_transmit(){
 
 		}
 	}
-	cout << "LEAVING SERVER transmitting() at " << sc_time_stamp().to_seconds() << endl;
+	//cout << "LEAVING SERVER transmitting() at " << sc_time_stamp().to_seconds() << endl;
 
 }
 
 void SERVER<server_T>::print_server(){
 
-	cout << "=================================================" << endl;
-	cout << "|\t\tSERVER at " << sc_time_stamp().to_seconds() << "\t\t\t| " << endl;
-	cout << "=================================================" << endl;
-	cout << "| SERVER FREE STATUS: " << server_is_free << endl;
-	cout << "| TRANSMITTING:       " << transmitting.read() << endl;
-	cout << "=================================================" << endl;
+	cout << "=========================================" << endl;
+	cout << "|\t\tSERVER at " << sc_time_stamp().to_seconds() << "\t\t| " << endl;
+	cout << "=========================================" << endl;
+	cout << "| SERVER FREE STATUS: " << server_is_free << "\t\t\t|"<<endl;
+	cout << "| TRANSMITTING:       " << transmitting.read() << "\t\t\t|" << endl;
+	cout << "=========================================" << endl;
 	// THEN READ DATA STRUCTURE FROM LOCAL ARRAYS
-	cout << "|MOBILE\t|FREE\t|REQ\t|PERM\t|START\t|DONE\t|" << endl;
+	cout << "|MOBILE\t|FREE\t|REQ\t|PERM\t|START\t|" << endl;
 	for (int i = 0; i < NUM_MOBILES; i++){
 		server_array[i][0] = i;
 		server_array[i][1] = free_out[i].read();
 		server_array[i][2] = packet_request_in[i].read();
 		server_array[i][3] = packet_permission_out[i].read();
 		server_array[i][4] = start_transmission_in[i].read();
-		server_array[i][5] = done_out[i].read();
 		cout << "|";
 		for (int j = 0; j < SERVER_ARRAY_NUM_COLUMNS; j++){
 			cout << server_array[i][j] << "\t|";
 		}
 		cout << endl;
 	}
-	cout << "=================================================" << endl;
+	cout << "=========================================" << endl;
 
 
 	/*cout << endl << "======Tuple ARRAY in SERVER=======" << endl;
