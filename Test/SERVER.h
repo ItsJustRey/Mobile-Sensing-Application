@@ -15,12 +15,13 @@ public:
 	sc_out<bool> packet_permission_out[NUM_MOBILES];		// SERVER[i] --> MOBILE[i]
 	sc_in<bool> start_transmission_in[NUM_MOBILES];			// SERVER[i] <-- MOBILE[i]
 
-	sc_signal<bool> server_is_free;
+	
 	sc_signal<bool> transmitting;
 	bool is_transmitting;
+	bool server_is_free;
 
 	sc_int<8>  server_array[NUM_MOBILES][SERVER_ARRAY_NUM_COLUMNS];	// SERVER DATA STRUCTURE 
-	
+
 
 
 	void prc_receive_from_mobile();
@@ -34,13 +35,13 @@ public:
 
 	{
 		is_transmitting = false;
+		server_is_free = true;
 		cout << "CREATING SERVER..." << "\tName: " << name << endl;
 
 		for (int i = 0; i < NUM_MOBILES; i++)
 		{
 			free_out[i].initialize(1);
 		}
-		server_is_free.write(1);
 
 		SC_METHOD(prc_receive_from_mobile);
 		for (int i = 0; i < NUM_MOBILES; i++)

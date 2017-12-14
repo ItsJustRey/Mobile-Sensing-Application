@@ -4,11 +4,11 @@ typedef int mobile_T;
 
 void MOBILE<mobile_T>::prc_mobile(){
 
-	
-	
+
+
 	if (!transmitting && packet_full.read() == 0){
 
-		
+
 		if (sc_time_stamp().to_seconds() < 5.00)
 		{
 			currentImageIndex = 0;
@@ -70,9 +70,9 @@ void MOBILE<mobile_T>::detect_tuple(){
 			}
 			else
 			{
-				cout << "MOBILE " << *(_mobile_id) << " PACKET IS FULL at " << sc_time_stamp().to_seconds() <<  endl;
+				cout << "MOBILE " << *(_mobile_id) << " PACKET IS FULL at " << sc_time_stamp().to_seconds() << endl;
 				packet_full.write(1);
-				
+
 			}
 		}
 	}
@@ -82,12 +82,12 @@ void MOBILE<mobile_T>::detect_tuple(){
 // SC_THREAD triggered on packet_full
 void MOBILE<mobile_T>::prc_request_to_server(){
 	//cout << "MOBILE " << *(_mobile_id) << " prc_request_to_server() triggered at " << sc_time_stamp().to_seconds() << endl;
-	
+
 	while (true)
 	{
 		//cout << " INSIDE MOBILE " << *(_mobile_id) << " prc_request_to_server() WHILE LOOP at " << sc_time_stamp().to_seconds() << endl;
 		// SERVER IS FREE AND PACKET IS FULL
-		if (free_in.read() == 1 && packet_full.read() ==1 && tuple_counter == PACKET_SIZE)
+		if (free_in.read() == 1 && packet_full.read() == 1 && tuple_counter == PACKET_SIZE)
 		{
 			cout << "  MOBILE " << *(_mobile_id) << " SEES THAT SERVER IS FREE at " << sc_time_stamp().to_seconds() << endl;
 
@@ -96,19 +96,20 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 
 				packet_request_out.write(1);
 				cout << "   MOBILE " << *(_mobile_id) << " IS REQUESTING SERVER at " << sc_time_stamp().to_seconds() << endl;
-				
+				wait(4, SC_MS);
+
 			}
-			
+
 			if (packet_permission_in.read() == 1 && transmitting == false)
 			{
 				cout << "     PACKET PERMISSION  GRANTED to MOBILE " << *(_mobile_id) << " at " << sc_time_stamp().to_seconds() << endl;
 				cout << "     MOBILE " << *(_mobile_id) << " STARTING TRANSMISSION at " << sc_time_stamp().to_seconds() << endl;
+				mobile_file << sc_time_stamp().to_seconds() << "s " << "Transmit" << endl;
 				transmitting = true;
 				start_transmission_out.write(1);
 				wait(8, SC_MS);
 				cout << "     MOBILE " << *(_mobile_id) << " DONE TRANSMISSION! at " << sc_time_stamp().to_seconds() << endl;
-
-
+				mobile_file << sc_time_stamp().to_seconds() << "s " << "Receive" << endl;
 
 				packet_counter++;
 				transmitting = false;
@@ -116,19 +117,20 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 				start_transmission_out.write(0);
 				packet_full.write(0);
 				tuple_counter = 0;
-				for (int i = 0; i < PACKET_SIZE; i++){
-
-					for (int j = 0; j < tuple_NUM_COLUMNS; j++){
+				for (int i = 0; i < PACKET_SIZE; i++)
+				{
+					for (int j = 0; j < tuple_NUM_COLUMNS; j++)
+					{
 
 						TUPLE_ARRAY[i][j] = 0;
-
 					}
 				}
 
 			}
 			else
 			{
-				cout << "     PACKET PERMISSION NOT GRANTED to MOBILE " << *(_mobile_id) << "at " << sc_time_stamp().to_seconds() << endl;
+				packet_request_out.write(0);
+				cout << "     PACKET PERMISSION NOT GRANTED to MOBILE " << *(_mobile_id) << " at " << sc_time_stamp().to_seconds() << endl;
 				wait(8, SC_MS);
 			}
 		}
@@ -145,8 +147,8 @@ void MOBILE<mobile_T>::print_mobile(){
 	cout << "=================================================" << endl;
 	cout << "|\t\tMOBILE " << *(_mobile_id) << " at " << sc_time_stamp().to_seconds() << "\t\t| " << endl;
 	cout << "=================================================" << endl;
-	cout << "| TUPLE COUNTER: \t" << tuple_counter << "\t\t\t|" <<endl;
-	cout << "| PACKET COUNTER:\t" << packet_counter << "\t\t\t|" <<endl;
+	cout << "| TUPLE COUNTER: \t" << tuple_counter << "\t\t\t|" << endl;
+	cout << "| PACKET COUNTER:\t" << packet_counter << "\t\t\t|" << endl;
 	cout << "| PACKET FULL:   \t" << packet_full.read() << "\t\t\t|" << endl;
 	cout << "| TRANSMITTING:   \t" << transmitting << "\t\t\t|" << endl;
 	cout << "=================================================" << endl;
@@ -162,11 +164,11 @@ void MOBILE<mobile_T>::print_mobile(){
 	cout << "==============================" << endl;
 	for (int i = 0; i < PACKET_SIZE; i++){
 
-		cout << "|";
-		for (int j = 0; j < tuple_NUM_COLUMNS; j++){
-			cout << TUPLE_ARRAY[i][j] << "\t|";
-		}
-		cout << endl;
+	cout << "|";
+	for (int j = 0; j < tuple_NUM_COLUMNS; j++){
+	cout << TUPLE_ARRAY[i][j] << "\t|";
+	}
+	cout << endl;
 	}
 	cout << "=========================================" << endl;
 	*/

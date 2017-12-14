@@ -26,12 +26,16 @@ public:
 	sc_int<16>  LEFT_BOTTOM_Y[NUM_ROI][NUM_IMAGES];
 	sc_int<16>  RIGHT_TOP_X[NUM_ROI][NUM_IMAGES];
 	sc_int<16>  RIGHT_TOP_Y[NUM_ROI][NUM_IMAGES];
-	
+
 	sc_signal<bool> ROI_INDEX_SIG[NUM_ROI];					// SIGNAL THAT INDICATES IF X AND Y ARE WITHIN AN ROI
-	
+
 	double  TUPLE_ARRAY[PACKET_SIZE][tuple_NUM_COLUMNS];	// TUPLE DATA STRUCTURE
 	double	ROI_TIME_START[NUM_ROI];						// ARRAY TO HOLD EACH TUPLE's START TIME
 	double	ROI_TIME_END[NUM_ROI];							// ARRAY TO HOLD EACH TUPLE's END TIME
+
+	ofstream mobile_file;
+	string MOBILE_FILE_NAME;
+
 
 	int currentImageIndex;
 	int tuple_counter;										// NUMBER OF TUPLES
@@ -39,7 +43,7 @@ public:
 	bool transmitting;
 
 	void prc_mobile();
-	void detect_tuple();	
+	void detect_tuple();
 	void prc_request_to_server();
 	void transmission_done();
 	void print_mobile();
@@ -48,6 +52,9 @@ public:
 	MOBILE(sc_module_name name, const T* mobile_id) :
 		sc_module(name), _mobile_id(mobile_id)
 	{
+		MOBILE_FILE_NAME = "mobile" + to_string(*_mobile_id) + "_file.txt";
+		mobile_file.open(MOBILE_FILE_NAME);
+
 
 		cout << "CREATING MOBILE..." << "\tName: " << name << endl;
 		currentImageIndex = 0;
@@ -80,7 +87,7 @@ public:
 			RIGHT_TOP_Y[3][i] = 550;
 			RIGHT_TOP_Y[4][i] = 1000;
 		}
-		
+
 		SC_METHOD(prc_mobile);
 		sensitive << clock.pos();
 		dont_initialize();

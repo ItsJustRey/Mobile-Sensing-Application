@@ -1,4 +1,3 @@
-// All systemc modules should include systemc.h header file
 #include "systemc.h"
 #include "SENSOR.h"
 #include "MOBILE.h"
@@ -41,7 +40,7 @@ int sc_main(int argc, char *argv[]){
 	sensor2.clock(clk_sig);
 	sensor2.randX(randX_sig[2]);
 	sensor2.randY(randY_sig[2]);
-	
+
 
 	//CREATE SERVER
 	typedef int server_T;
@@ -59,7 +58,7 @@ int sc_main(int argc, char *argv[]){
 	// CREATE MOBILE 0
 	typedef int mobile0_T;
 	const mobile0_T mobile0_id = 0;
-	MOBILE<mobile0_T>	mobile0("mobile0",&mobile0_id);
+	MOBILE<mobile0_T>	mobile0("mobile0", &mobile0_id);
 	mobile0.clock(clk_sig);
 	mobile0.randX(randX_sig[0]);
 	mobile0.randY(randY_sig[0]);
@@ -90,9 +89,8 @@ int sc_main(int argc, char *argv[]){
 	mobile2.packet_request_out(packet_request_sig[2]);			// SERVER[i] <-- MOBILE[i]
 	mobile2.packet_permission_in(packet_permission_sig[2]);		// SERVER[i] --> MOBILE[i]
 	mobile2.start_transmission_out(start_transmission_sig[2]);	// SERVER[i] <-- MOBILE[i]
-	
-	// CONTUINUE FOR 10 SECOND
-	sc_start(10.5, SC_SEC);
+
+	sc_start(200, SC_SEC);
 
 	return 0;
 }
