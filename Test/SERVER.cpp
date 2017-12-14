@@ -4,6 +4,67 @@
 
 typedef int server_T;
 
+void SERVER<server_T>::send_new_image(){
+
+	double currentSimulationTime = sc_time_stamp().to_seconds();
+	if (currentSimulationTime >= IMAGE1_TIME && currentSimulationTime < IMAGE2_TIME)
+	{
+		currentImageIndex = 1;
+		//cout << " SERVER IS SENDING IMAGE " << currentImageIndex << " at " << sc_time_stamp().to_seconds() << endl;
+		for (int i = 0; i < NUM_MOBILES; i++)
+		{
+			send_new_image_out[i].write(1);
+		}
+
+	}
+	else if (currentSimulationTime >= IMAGE2_TIME && currentSimulationTime < IMAGE3_TIME)
+	{
+		currentImageIndex = 2;
+		//cout << " SERVER IS SENDING IMAGE " << currentImageIndex << " at " << sc_time_stamp().to_seconds() << endl;
+		for (int i = 0; i < NUM_MOBILES; i++)
+		{
+			send_new_image_out[i].write(2);
+		}
+
+	}
+	else if (currentSimulationTime >= IMAGE3_TIME && currentSimulationTime < IMAGE4_TIME)
+	{
+		currentImageIndex = 3;
+		//cout << " SERVER IS SENDING IMAGE " << currentImageIndex << " at " << sc_time_stamp().to_seconds() << endl;
+		for (int i = 0; i < NUM_MOBILES; i++)
+		{
+			send_new_image_out[i].write(3);
+		}
+
+	}
+	else if (currentSimulationTime >= IMAGE4_TIME && currentSimulationTime < IMAGE5_TIME)
+	{
+		currentImageIndex = 4;
+		//cout << " SERVER IS SENDING IMAGE " << currentImageIndex << " at " << sc_time_stamp().to_seconds() << endl;
+		for (int i = 0; i < NUM_MOBILES; i++)
+		{
+			send_new_image_out[i].write(4);
+		}
+
+	}
+	else if (currentSimulationTime >= IMAGE5_TIME)
+	{
+		currentImageIndex = 5;
+		//cout << " SERVER IS SENDING IMAGE " << currentImageIndex << " at " << sc_time_stamp().to_seconds() << endl;
+		for (int i = 0; i < NUM_MOBILES; i++)
+		{
+			send_new_image_out[i].write(5);
+		}
+
+	}
+}
+
+
+
+
+
+
+
 // SC_METHOD triggered for each mobile's packet_request_in[i]
 void SERVER<server_T>::prc_receive_from_mobile(){
 	cout << "SERVER prc_receive_from_mobile() triggered at " << sc_time_stamp().to_seconds() << endl;
@@ -81,30 +142,31 @@ void SERVER<server_T>::prc_transmit(){
 }
 
 void SERVER<server_T>::print_server(){
-
-	cout << "=========================================" << endl;
-	cout << "|\t\tSERVER at " << sc_time_stamp().to_seconds() << "\t\t| " << endl;
-	cout << "=========================================" << endl;
-	cout << "| SERVER FREE STATUS: " << server_is_free << "\t\t\t|" << endl;
-	cout << "| TRANSMITTING:       " << transmitting.read() << "\t\t\t|" << endl;
-	cout << "=========================================" << endl;
-	// THEN READ DATA STRUCTURE FROM LOCAL ARRAYS
-	cout << "|MOBILE\t|FREE\t|REQ\t|PERM\t|START\t|" << endl;
-	for (int i = 0; i < NUM_MOBILES; i++){
-		server_array[i][0] = i;
-		server_array[i][1] = free_out[i].read();
-		server_array[i][2] = packet_request_in[i].read();
-		server_array[i][3] = packet_permission_out[i].read();
-		server_array[i][4] = start_transmission_in[i].read();
-		cout << "|";
-		for (int j = 0; j < SERVER_ARRAY_NUM_COLUMNS; j++){
-			cout << server_array[i][j] << "\t|";
+	if (currentImageIndex > 0)
+	{
+		cout << "=========================================" << endl;
+		cout << "|\t\tSERVER at " << sc_time_stamp().to_seconds() << "\t\t| " << endl;
+		cout << "=========================================" << endl;
+		cout << "| SERVER FREE STATUS: " << server_is_free << "\t\t\t|" << endl;
+		cout << "| TRANSMITTING:       " << transmitting.read() << "\t\t\t|" << endl;
+		cout << "=========================================" << endl;
+		// THEN READ DATA STRUCTURE FROM LOCAL ARRAYS
+		cout << "|MOBILE\t|FREE\t|REQ\t|PERM\t|START\t|" << endl;
+		for (int i = 0; i < NUM_MOBILES; i++){
+			server_array[i][0] = i;
+			server_array[i][1] = free_out[i].read();
+			server_array[i][2] = packet_request_in[i].read();
+			server_array[i][3] = packet_permission_out[i].read();
+			server_array[i][4] = start_transmission_in[i].read();
+			cout << "|";
+			for (int j = 0; j < SERVER_ARRAY_NUM_COLUMNS; j++){
+				cout << server_array[i][j] << "\t|";
+			}
+			cout << endl;
 		}
-		cout << endl;
+		cout << "=========================================" << endl;
+
 	}
-	cout << "=========================================" << endl;
-
-
 	/*cout << endl << "======Tuple ARRAY in SERVER=======" << endl;
 	cout << "===========================================================================" << endl;
 	cout << "|\t MOBILE 0 \t\t MOBILE 1 \t\t MOBILE 2 \t|" << endl;

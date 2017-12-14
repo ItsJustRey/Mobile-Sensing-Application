@@ -15,12 +15,14 @@ public:
 	sc_in<bool> clock;
 	sc_in<sc_int<16> > randX;
 	sc_in<sc_int<16> > randY;
+	sc_in<sc_int<16> > receive_new_image_in;	// SERVER --> MOBILE[i]
+
 
 	sc_in<bool> free_in;						// SERVER --> MOBILE[i]
 	sc_signal<bool> packet_full;
-	sc_out<bool> packet_request_out;			// SERVER[i] <-- MOBILE[i]
-	sc_in<bool> packet_permission_in;			// SERVER[i] --> MOBILE[i]
-	sc_out<bool> start_transmission_out;		// SERVER[i] <-- MOBILE[i]
+	sc_out<bool> packet_request_out;			// SERVER <-- MOBILE[i]
+	sc_in<bool> packet_permission_in;			// SERVER --> MOBILE[i]
+	sc_out<bool> start_transmission_out;		// SERVER <-- MOBILE[i]
 
 	sc_int<16>  LEFT_BOTTOM_X[NUM_ROI][NUM_IMAGES];
 	sc_int<16>  LEFT_BOTTOM_Y[NUM_ROI][NUM_IMAGES];

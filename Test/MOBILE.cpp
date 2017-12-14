@@ -8,32 +8,26 @@ void MOBILE<mobile_T>::prc_mobile(){
 
 	if (!transmitting && packet_full.read() == 0){
 
-
-		if (sc_time_stamp().to_seconds() < 5.00)
+		currentImageIndex = receive_new_image_in.read();
+		if (currentImageIndex > 0)
 		{
-			currentImageIndex = 0;
-		}
-		else{
-			currentImageIndex = 1;
-		}
-
-		cout << "MOBILE " << *(_mobile_id) << " HAS READ X = " << randX.read() << " Y = " << randY.read() << " at " << sc_time_stamp().to_seconds() << " from IMAGE " << currentImageIndex << endl;
-		for (int i = 0; i < NUM_ROI; i++)
-		{
-			// CHECK IF X AND Y IS WITHIN THIS REGION OF INTEREST
-			if (((LEFT_BOTTOM_X[i][currentImageIndex] <= randX.read()) && (randX.read() <= RIGHT_TOP_X[i][currentImageIndex])) &&
-				((LEFT_BOTTOM_Y[i][currentImageIndex] <= randY.read()) && (randY.read() <= RIGHT_TOP_Y[i][currentImageIndex]))
-				)
+			cout << "MOBILE " << *(_mobile_id) << " HAS READ X = " << randX.read() << " Y = " << randY.read() << " at " << sc_time_stamp().to_seconds() << " from IMAGE " << currentImageIndex << endl;
+			for (int i = 0; i < NUM_ROI; i++)
 			{
-				cout << "X AND Y WITHIN ROI " << i + 1 << endl;
-				//cout << "WRITING A POSEDGE TO ROI" << i + 1 << endl;
-				ROI_INDEX_SIG[i].write(true);
+				// CHECK IF X AND Y IS WITHIN THIS REGION OF INTEREST
+				if (((LEFT_BOTTOM_X[i][currentImageIndex] <= randX.read()) && (randX.read() <= RIGHT_TOP_X[i][currentImageIndex])) &&
+					((LEFT_BOTTOM_Y[i][currentImageIndex] <= randY.read()) && (randY.read() <= RIGHT_TOP_Y[i][currentImageIndex]))
+					)
+				{
+					cout << "X AND Y WITHIN ROI " << i + 1 << endl;
+					//cout << "WRITING A POSEDGE TO ROI" << i + 1 << endl;
+					ROI_INDEX_SIG[i].write(true);
+				}
+				else {
+					//cout << "WRITING A NEGEDGE TO ROI" << i + 1 << endl;
+					ROI_INDEX_SIG[i].write(false);
+				}
 			}
-			else {
-				//cout << "WRITING A NEGEDGE TO ROI" << i + 1 << endl;
-				ROI_INDEX_SIG[i].write(false);
-			}
-
 		}
 
 	}
@@ -104,12 +98,12 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 			{
 				cout << "     PACKET PERMISSION  GRANTED to MOBILE " << *(_mobile_id) << " at " << sc_time_stamp().to_seconds() << endl;
 				cout << "     MOBILE " << *(_mobile_id) << " STARTING TRANSMISSION at " << sc_time_stamp().to_seconds() << endl;
-				mobile_file << sc_time_stamp().to_seconds() << "s " << "Transmit" << endl;
+				mobile_file << sc_time_stamp().to_seconds() << "s " << "Transmitting Packet of Image " << currentImageIndex << endl;
 				transmitting = true;
 				start_transmission_out.write(1);
 				wait(8, SC_MS);
 				cout << "     MOBILE " << *(_mobile_id) << " DONE TRANSMISSION! at " << sc_time_stamp().to_seconds() << endl;
-				mobile_file << sc_time_stamp().to_seconds() << "s " << "Receive" << endl;
+				mobile_file << sc_time_stamp().to_seconds() << "s " << "Received Packet of Image " << currentImageIndex << endl;
 
 				packet_counter++;
 				transmitting = false;
@@ -143,21 +137,23 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 
 
 void MOBILE<mobile_T>::print_mobile(){
-
-	cout << "=================================================" << endl;
-	cout << "|\t\tMOBILE " << *(_mobile_id) << " at " << sc_time_stamp().to_seconds() << "\t\t| " << endl;
-	cout << "=================================================" << endl;
-	cout << "| TUPLE COUNTER: \t" << tuple_counter << "\t\t\t|" << endl;
-	cout << "| PACKET COUNTER:\t" << packet_counter << "\t\t\t|" << endl;
-	cout << "| PACKET FULL:   \t" << packet_full.read() << "\t\t\t|" << endl;
-	cout << "| TRANSMITTING:   \t" << transmitting << "\t\t\t|" << endl;
-	cout << "=================================================" << endl;
-	cout << "| SERVER FREE:   \t" << free_in.read() << "\t\t\t|" << endl;
-	cout << "| PACKET REQ:    \t" << packet_request_out.read() << "\t\t\t|" << endl;
-	cout << "| PACKET PERM:   \t" << packet_permission_in.read() << "\t\t\t|" << endl;
-	cout << "| START TRANSM:  \t" << start_transmission_out.read() << "\t\t\t|" << endl;
-	cout << "=================================================" << endl;
-
+	if (currentImageIndex > 0)
+	{
+		cout << "=================================================" << endl;
+		cout << "|\t\tMOBILE " << *(_mobile_id) << " at " << sc_time_stamp().to_seconds() << "\t\t| " << endl;
+		cout << "=================================================" << endl;
+		cout << "| IMAGE INDEX  : \t" << tuple_counter << "\t\t\t|" << endl;
+		cout << "| TUPLE COUNTER: \t" << tuple_counter << "\t\t\t|" << endl;
+		cout << "| PACKET COUNTER:\t" << packet_counter << "\t\t\t|" << endl;
+		cout << "| PACKET FULL:   \t" << packet_full.read() << "\t\t\t|" << endl;
+		cout << "| TRANSMITTING:  \t" << transmitting << "\t\t\t|" << endl;
+		cout << "=================================================" << endl;
+		cout << "| SERVER FREE:   \t" << free_in.read() << "\t\t\t|" << endl;
+		cout << "| PACKET REQ:    \t" << packet_request_out.read() << "\t\t\t|" << endl;
+		cout << "| PACKET PERM:   \t" << packet_permission_in.read() << "\t\t\t|" << endl;
+		cout << "| START TRANSM:  \t" << start_transmission_out.read() << "\t\t\t|" << endl;
+		cout << "=================================================" << endl;
+	}
 
 	/*cout << endl << "======Tuple ARRAY in Mobile " << *(_mobile_id) << "=======" << endl;
 	cout << "|ROI\t|START\t|END\t|" << endl;

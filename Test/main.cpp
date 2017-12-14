@@ -12,10 +12,11 @@ int sc_main(int argc, char *argv[]){
 
 	sc_signal<sc_int<16> >	randX_sig[NUM_MOBILE];
 	sc_signal<sc_int<16> >	randY_sig[NUM_MOBILE];
-	sc_signal<bool>			free_sig[NUM_MOBILE];						// SERVER[i] --> MOBILE[i]
-	sc_signal<bool>			packet_request_sig[NUM_MOBILE];				// SERVER[i] <-- MOBILE[i]
-	sc_signal<bool>			packet_permission_sig[NUM_MOBILE];			// SERVER[i] --> MOBILE[i]
-	sc_signal<bool>			start_transmission_sig[NUM_MOBILES];		// SERVER[i] <-- MOBILE[i]
+	sc_signal<bool>			free_sig[NUM_MOBILE];						// SERVER --> MOBILE[i]
+	sc_signal<bool>			packet_request_sig[NUM_MOBILE];				// SERVER <-- MOBILE[i]
+	sc_signal<bool>			packet_permission_sig[NUM_MOBILE];			// SERVER --> MOBILE[i]
+	sc_signal<bool>			start_transmission_sig[NUM_MOBILES];		// SERVER <-- MOBILE[i]
+	sc_signal<sc_int<16> >	new_image_sig[NUM_MOBILES];					// SERVER --> MOBILE[i]
 
 	// CREATE SENSOR 0
 	typedef int sensor0_T;
@@ -49,10 +50,11 @@ int sc_main(int argc, char *argv[]){
 
 	for (int i = 0; i < NUM_MOBILE; i++)
 	{
-		server.free_out[i](free_sig[i]);							// SERVER[i] --> MOBILE[i]
-		server.packet_request_in[i](packet_request_sig[i]);			// SERVER[i] <-- MOBILE[i]
-		server.packet_permission_out[i](packet_permission_sig[i]);	// SERVER[i] --> MOBILE[i]
-		server.start_transmission_in[i](start_transmission_sig[i]);	// SERVER[i] <-- MOBILE[i]
+		server.free_out[i](free_sig[i]);							// SERVER --> MOBILE[i]
+		server.packet_request_in[i](packet_request_sig[i]);			// SERVER <-- MOBILE[i]
+		server.packet_permission_out[i](packet_permission_sig[i]);	// SERVER --> MOBILE[i]
+		server.start_transmission_in[i](start_transmission_sig[i]);	// SERVER <-- MOBILE[i]
+		server.send_new_image_out[i](new_image_sig[i]);				// SERVER --> MOBILE[i]
 	}
 
 	// CREATE MOBILE 0
@@ -62,10 +64,11 @@ int sc_main(int argc, char *argv[]){
 	mobile0.clock(clk_sig);
 	mobile0.randX(randX_sig[0]);
 	mobile0.randY(randY_sig[0]);
-	mobile0.free_in(free_sig[0]);								// SERVER[i] --> MOBILE[i]
-	mobile0.packet_request_out(packet_request_sig[0]);			// SERVER[i] <-- MOBILE[i]
-	mobile0.packet_permission_in(packet_permission_sig[0]);		// SERVER[i] --> MOBILE[i]
-	mobile0.start_transmission_out(start_transmission_sig[0]);	// SERVER[i] <-- MOBILE[i]
+	mobile0.free_in(free_sig[0]);								// SERVER --> MOBILE[i]
+	mobile0.packet_request_out(packet_request_sig[0]);			// SERVER <-- MOBILE[i]
+	mobile0.packet_permission_in(packet_permission_sig[0]);		// SERVER --> MOBILE[i]
+	mobile0.start_transmission_out(start_transmission_sig[0]);	// SERVER <-- MOBILE[i]
+	mobile0.receive_new_image_in(new_image_sig[0]);				// SERVER --> MOBILE[i]
 	// CREATE MOBILE 1
 	typedef int mobile1_T;
 	const mobile1_T mobile1_id = 1;
@@ -73,10 +76,11 @@ int sc_main(int argc, char *argv[]){
 	mobile1.clock(clk_sig);
 	mobile1.randX(randX_sig[1]);
 	mobile1.randY(randY_sig[1]);
-	mobile1.free_in(free_sig[1]);								// SERVER[i] --> MOBILE[i]
-	mobile1.packet_request_out(packet_request_sig[1]);			// SERVER[i] <-- MOBILE[i]
-	mobile1.packet_permission_in(packet_permission_sig[1]);		// SERVER[i] --> MOBILE[i]
-	mobile1.start_transmission_out(start_transmission_sig[1]);	// SERVER[i] <-- MOBILE[i]
+	mobile1.free_in(free_sig[1]);								// SERVER --> MOBILE[i]
+	mobile1.packet_request_out(packet_request_sig[1]);			// SERVER <-- MOBILE[i]
+	mobile1.packet_permission_in(packet_permission_sig[1]);		// SERVER --> MOBILE[i]
+	mobile1.start_transmission_out(start_transmission_sig[1]);	// SERVER <-- MOBILE[i]
+	mobile1.receive_new_image_in(new_image_sig[1]);				// SERVER --> MOBILE[i]
 
 	// CREATE MOBILE 2
 	typedef int mobile2_T;
@@ -85,10 +89,11 @@ int sc_main(int argc, char *argv[]){
 	mobile2.clock(clk_sig);
 	mobile2.randX(randX_sig[2]);
 	mobile2.randY(randY_sig[2]);
-	mobile2.free_in(free_sig[2]);								// SERVER[i] --> MOBILE[i]
-	mobile2.packet_request_out(packet_request_sig[2]);			// SERVER[i] <-- MOBILE[i]
-	mobile2.packet_permission_in(packet_permission_sig[2]);		// SERVER[i] --> MOBILE[i]
-	mobile2.start_transmission_out(start_transmission_sig[2]);	// SERVER[i] <-- MOBILE[i]
+	mobile2.free_in(free_sig[2]);								// SERVER --> MOBILE[i]
+	mobile2.packet_request_out(packet_request_sig[2]);			// SERVER <-- MOBILE[i]
+	mobile2.packet_permission_in(packet_permission_sig[2]);		// SERVER --> MOBILE[i]
+	mobile2.start_transmission_out(start_transmission_sig[2]);	// SERVER <-- MOBILE[i]
+	mobile2.receive_new_image_in(new_image_sig[2]);				// SERVER --> MOBILE[i]
 
 	sc_start(200, SC_SEC);
 
