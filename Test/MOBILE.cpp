@@ -1,33 +1,41 @@
 #include "MOBILE.h"
-
+#include <iostream>
+#include <iomanip>
 typedef int mobile_T;
 
 void MOBILE<mobile_T>::prc_mobile(){
 
-
-
 	if (!transmitting && packet_full.read() == 0){
 
+	
 		currentImageIndex = receive_new_image_in.read();
-		if (currentImageIndex > 0)
+
+		if (currentImageIndex > 0 && image_counter != currentImageIndex)
 		{
-			cout << "MOBILE " << *(_mobile_id) << " HAS READ X = " << randX.read() << " Y = " << randY.read() << " at " << sc_time_stamp().to_seconds() << " from IMAGE " << currentImageIndex << endl;
+			cout << "MOBILE " << *(_mobile_id) << " HAS READ X = " << randX.read() << " Y = " << randY.read() << " at " << sc_time_stamp().to_seconds() << " from IMAGE " << currentImageIndex;
+			int within_this_ROI = 0;
 			for (int i = 0; i < NUM_ROI; i++)
 			{
+				
 				// CHECK IF X AND Y IS WITHIN THIS REGION OF INTEREST
 				if (((LEFT_BOTTOM_X[i][currentImageIndex] <= randX.read()) && (randX.read() <= RIGHT_TOP_X[i][currentImageIndex])) &&
 					((LEFT_BOTTOM_Y[i][currentImageIndex] <= randY.read()) && (randY.read() <= RIGHT_TOP_Y[i][currentImageIndex]))
 					)
 				{
-					cout << "X AND Y WITHIN ROI " << i + 1 << endl;
+					within_this_ROI = i + 1;
+					cout << " (WITHIN ROI " << i + 1  << ")" << endl;
 					//cout << "WRITING A POSEDGE TO ROI" << i + 1 << endl;
 					ROI_INDEX_SIG[i].write(true);
 				}
 				else {
+					
 					//cout << "WRITING A NEGEDGE TO ROI" << i + 1 << endl;
 					ROI_INDEX_SIG[i].write(false);
 				}
 			}
+			if (within_this_ROI > 0 )
+				cout << " (WITHIN ROI " << within_this_ROI << ")" << endl;
+
 		}
 
 	}
@@ -98,14 +106,25 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 			{
 				cout << "     PACKET PERMISSION  GRANTED to MOBILE " << *(_mobile_id) << " at " << sc_time_stamp().to_seconds() << endl;
 				cout << "     MOBILE " << *(_mobile_id) << " STARTING TRANSMISSION at " << sc_time_stamp().to_seconds() << endl;
-				mobile_file << sc_time_stamp().to_seconds() << "s " << "Transmitting Packet of Image " << currentImageIndex << endl;
+				mobile_file1 << std::fixed << std::setprecision(3) << sc_time_stamp().to_seconds() << "s ";
+				mobile_file1 << "\tImage " << currentImageIndex << " packet transmitted" << endl;
 				transmitting = true;
 				start_transmission_out.write(1);
-				wait(8, SC_MS);
+				//wait(8, SC_MS);
+				wait(transmission_time, SC_SEC);
 				cout << "     MOBILE " << *(_mobile_id) << " DONE TRANSMISSION! at " << sc_time_stamp().to_seconds() << endl;
-				mobile_file << sc_time_stamp().to_seconds() << "s " << "Received Packet of Image " << currentImageIndex << endl;
+				mobile_file1 << std::fixed << std::setprecision(3) << sc_time_stamp().to_seconds() << "s ";
+				mobile_file1 << "\tImage " << currentImageIndex << " packet received" << endl;
 
+				if (image_transmitted_done_in.read() == 1)
+				{
+					image_counter++;
+					packet_counter = 0;
+				}
+
+				receive_packet_counter++;
 				packet_counter++;
+
 				transmitting = false;
 				packet_request_out.write(0);
 				start_transmission_out.write(0);
@@ -137,12 +156,14 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 
 
 void MOBILE<mobile_T>::print_mobile(){
+
 	if (currentImageIndex > 0)
 	{
 		cout << "=================================================" << endl;
 		cout << "|\t\tMOBILE " << *(_mobile_id) << " at " << sc_time_stamp().to_seconds() << "\t\t| " << endl;
 		cout << "=================================================" << endl;
-		cout << "| IMAGE INDEX  : \t" << tuple_counter << "\t\t\t|" << endl;
+		cout << "| IMAGE INDEX:   \t" << currentImageIndex << "\t\t\t|" << endl;
+		cout << "| IMAGE COUNTER: \t" << image_counter << "\t\t\t|" << endl;
 		cout << "| TUPLE COUNTER: \t" << tuple_counter << "\t\t\t|" << endl;
 		cout << "| PACKET COUNTER:\t" << packet_counter << "\t\t\t|" << endl;
 		cout << "| PACKET FULL:   \t" << packet_full.read() << "\t\t\t|" << endl;
@@ -153,6 +174,10 @@ void MOBILE<mobile_T>::print_mobile(){
 		cout << "| PACKET PERM:   \t" << packet_permission_in.read() << "\t\t\t|" << endl;
 		cout << "| START TRANSM:  \t" << start_transmission_out.read() << "\t\t\t|" << endl;
 		cout << "=================================================" << endl;
+
+
+		mobile_file2 << std::fixed << std::setprecision(3) << sc_time_stamp().to_seconds();
+		mobile_file2 << std::fixed << std::setprecision(0) << "\t" << tuple_counter * TUPLE_SIZE + packet_counter * TRANSMIT_PACKET_SIZE + receive_packet_counter * RECEIVE_PACKET_SIZE + image_counter * IMAGE_SIZE << endl; // "\ttc: " << tuple_counter << "\tpc: " << packet_counter << "\trpc: " << receive_packet_counter << "\tic: " << image_counter << "\tcurrentImage: " << currentImageIndex << endl;
 	}
 
 	/*cout << endl << "======Tuple ARRAY in Mobile " << *(_mobile_id) << "=======" << endl;

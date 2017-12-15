@@ -1,13 +1,18 @@
 #include "systemc.h"
 #define _CRT_SECURE_NO_WARNINGS
+#include "CONSTANTS.h"
 using namespace std;
 
-const int NUM_ROI = 5;
-const int tuple_NUM_COLUMNS = 3;
-const int PACKET_SIZE = 20;
-const int NUM_IMAGES = 2;
-const int IMAGE_INDEX_0 = 0;
-const int IMAGE_INDEX_1 = 1;
+
+
+
+
+// RECEIVE PACKET SIZE
+//const int _SERVER_TO_MOBILE_PACKET_1MB = 1048576;
+//const int _SERVER_TO_MOBILE_PACKET_10MB = 10485760;
+
+// IMAGE SIZE
+//const int _IMAGE_SIZE = 8388608;
 
 template <class T> class MOBILE : public sc_module{
 public:
@@ -16,7 +21,7 @@ public:
 	sc_in<sc_int<16> > randX;
 	sc_in<sc_int<16> > randY;
 	sc_in<sc_int<16> > receive_new_image_in;	// SERVER --> MOBILE[i]
-
+	sc_in<bool> image_transmitted_done_in;		// SERVER --> MOBILE[i]
 
 	sc_in<bool> free_in;						// SERVER --> MOBILE[i]
 	sc_signal<bool> packet_full;
@@ -35,15 +40,22 @@ public:
 	double	ROI_TIME_START[NUM_ROI];						// ARRAY TO HOLD EACH TUPLE's START TIME
 	double	ROI_TIME_END[NUM_ROI];							// ARRAY TO HOLD EACH TUPLE's END TIME
 
-	ofstream mobile_file;
-	string MOBILE_FILE_NAME;
+	ofstream mobile_file1;
+	ofstream mobile_file2;
+	string MOBILE_TRAFFIC_FILE_NAME;
+	string MOBILE_MEMORY_FILE_NAME;
+
+	double transmission_time;									//transmission time = PACKET_SIZE / BANDWIDTH
+	double bandwidth;
+	double RECEIVE_PACKET_SIZE;
 
 
 	int currentImageIndex;
 	int tuple_counter;										// NUMBER OF TUPLES
-	int packet_counter;										// NUMBER OF PACKETS
+	int packet_counter;										// NUMBER OF TRANSMIT PACKETS
+	int receive_packet_counter;								// NUMBER OF RECEIVE PACKETS
+	int image_counter;										// NUMBER OF IMAGES RECEIVED
 	bool transmitting;
-
 	void prc_mobile();
 	void detect_tuple();
 	void prc_request_to_server();
@@ -54,15 +66,21 @@ public:
 	MOBILE(sc_module_name name, const T* mobile_id) :
 		sc_module(name), _mobile_id(mobile_id)
 	{
-		MOBILE_FILE_NAME = "mobile" + to_string(*_mobile_id) + "_file.txt";
-		mobile_file.open(MOBILE_FILE_NAME);
-
+		MOBILE_TRAFFIC_FILE_NAME = "mobile" + to_string(*_mobile_id) + "_traffic_file.txt";
+		MOBILE_MEMORY_FILE_NAME = "mobile" + to_string(*_mobile_id) + "_memory_file.txt";
+		mobile_file1.open(MOBILE_TRAFFIC_FILE_NAME);
+		mobile_file2.open(MOBILE_MEMORY_FILE_NAME);
+		bandwidth = BANDWIDTH_1MBS;
+		RECEIVE_PACKET_SIZE = SERVER_TO_MOBILE_PACKET_1MB;
+		transmission_time = RECEIVE_PACKET_SIZE / bandwidth;
 
 		cout << "CREATING MOBILE..." << "\tName: " << name << endl;
 		currentImageIndex = 0;
 		tuple_counter = 0;
 		packet_counter = 0;
+		image_counter = 0;
 		transmitting = false;
+
 		for (int i = 0; i < NUM_IMAGES; i++)
 		{
 			LEFT_BOTTOM_X[0][i] = 50;

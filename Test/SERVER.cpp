@@ -60,11 +60,6 @@ void SERVER<server_T>::send_new_image(){
 }
 
 
-
-
-
-
-
 // SC_METHOD triggered for each mobile's packet_request_in[i]
 void SERVER<server_T>::prc_receive_from_mobile(){
 	cout << "SERVER prc_receive_from_mobile() triggered at " << sc_time_stamp().to_seconds() << endl;
@@ -75,7 +70,7 @@ void SERVER<server_T>::prc_receive_from_mobile(){
 			if (server_is_free == true && free_out[i].read() == 1 && is_transmitting == false)
 			{
 				cout << " SERVER IS GIVING PERMISSION TO MOBILE " << i << " at " << sc_time_stamp().to_seconds() << endl;
-				transmitting.write(1);
+				transmitting[i].write(1);
 				is_transmitting = true;
 				packet_permission_out[i].write(1);
 				free_out[i].write(1);
@@ -104,42 +99,79 @@ void SERVER<server_T>::prc_receive_from_mobile(){
 }
 
 // SC_THREAD(prc_transmit);
-//sensitive << transmitting.posedge_event();
+//sensitive << transmitting[i].posedge_event();
 void SERVER<server_T>::prc_transmit(){
 	//cout << "SERVER transmitting() triggered at " << sc_time_stamp().to_seconds() << endl;
 
 	while (true)
 	{
+		
 		//cout << " INSIDE SERVER transmitting() triggered WHILE LOOP at " << sc_time_stamp().to_seconds() << endl;
 		if (is_transmitting == true)
 		{
-			cout << "   SERVER STARTING TRANSMISSION for MOBILE  at " << sc_time_stamp().to_seconds() << endl;
-
-			wait(16, SC_MS);
-
-
-			cout << "   SERVER DONE TRANSMISSION for MOBILE  at " << sc_time_stamp().to_seconds() << endl;
-			is_transmitting = false;
 			for (int i = 0; i < NUM_MOBILES; i++)
 			{
+				if (transmitting[i].read() == 1)
+				{
+					cout << "   SERVER STARTING TRANSMISSION for MOBILE " << i << " at " << sc_time_stamp().to_seconds() << endl;
 
-				packet_permission_out[i].write(0);
-				free_out[i].write(1);
+					//wait(16, SC_MS);
+					wait(transmission_time, SC_SEC);
+
+					cout << "   SERVER DONE TRANSMISSION for MOBILE " << i << " at " << sc_time_stamp().to_seconds() << endl;
+
+					image_bits_transmitted[i] += packet_size;
+					// IF IMAGE DONE TRANSMITTING, TELL THIS MOBILE, AND RESET 
+					if (image_bits_transmitted[i] >= IMAGE_SIZE)
+					{
+						image_transmitted_done_out[i].write(1);
+						image_bits_transmitted[i] = 0;
+					}
+					else{
+						image_transmitted_done_out[i].write(0);
+
+					}
+
+					// TELL ALL MOBILES
+					for (int j = 0; j < NUM_MOBILES; j++)
+					{
+						packet_permission_out[j].write(0);
+						free_out[j].write(1);
+					}
+
+					is_transmitting = false;
+					server_is_free = true;
+					transmitting[i].write(0);
+				}
 			}
-
-			//server_is_free.write(1);
-			server_is_free = true;
-			transmitting.write(0);
-
 		}
 		else
 		{
 			wait(8, SC_MS);
+			/*for (int i = 0; i < NUM_MOBILES; i++)
+			{
+				image_transmitted_done_out[i].write(0);
+
+			}*/
+			
 		}
 	}
 	//cout << "LEAVING SERVER transmitting() at " << sc_time_stamp().to_seconds() << endl;
 
 }
+
+
+//void SERVER<server_T>::image_transmitted_done(){
+//
+//	for (int i = 0; i < NUM_MOBILES; i++)
+//	{
+//		image_transmitted_done_out[i].write(1);
+//
+//
+//}
+
+
+
 
 void SERVER<server_T>::print_server(){
 	if (currentImageIndex > 0)
@@ -148,7 +180,7 @@ void SERVER<server_T>::print_server(){
 		cout << "|\t\tSERVER at " << sc_time_stamp().to_seconds() << "\t\t| " << endl;
 		cout << "=========================================" << endl;
 		cout << "| SERVER FREE STATUS: " << server_is_free << "\t\t\t|" << endl;
-		cout << "| TRANSMITTING:       " << transmitting.read() << "\t\t\t|" << endl;
+		cout << "| TRANSMITTING:       " << (transmitting[0].read() || transmitting[1].read() || transmitting[0].read() ) << "\t\t\t|" << endl;
 		cout << "=========================================" << endl;
 		// THEN READ DATA STRUCTURE FROM LOCAL ARRAYS
 		cout << "|MOBILE\t|FREE\t|REQ\t|PERM\t|START\t|" << endl;
