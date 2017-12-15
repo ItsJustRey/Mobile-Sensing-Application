@@ -107,19 +107,21 @@ void MOBILE<mobile_T>::prc_request_to_server(){
 				cout << "     PACKET PERMISSION  GRANTED to MOBILE " << *(_mobile_id) << " at " << sc_time_stamp().to_seconds() << endl;
 				cout << "     MOBILE " << *(_mobile_id) << " STARTING TRANSMISSION at " << sc_time_stamp().to_seconds() << endl;
 				mobile_file1 << std::fixed << std::setprecision(3) << sc_time_stamp().to_seconds() << "s ";
-				mobile_file1 << "\tImage " << currentImageIndex << " packet transmitted" << endl;
+				//mobile_file1 << "\tImage " << currentImageIndex << " packet transmitted" << endl;
+				mobile_file1 << "\t10" << endl;
 				transmitting = true;
 				start_transmission_out.write(1);
 				//wait(8, SC_MS);
 				wait(transmission_time, SC_SEC);
 				cout << "     MOBILE " << *(_mobile_id) << " DONE TRANSMISSION! at " << sc_time_stamp().to_seconds() << endl;
 				mobile_file1 << std::fixed << std::setprecision(3) << sc_time_stamp().to_seconds() << "s ";
-				mobile_file1 << "\tImage " << currentImageIndex << " packet received" << endl;
-
+				//mobile_file1 << "\tImage " << currentImageIndex << " packet received" << endl;
+				mobile_file1 << "\t5" << endl;
 				if (image_transmitted_done_in.read() == 1)
 				{
 					image_counter++;
-					packet_counter = 0;
+					packet_counter = -1;
+					receive_packet_counter = -1;
 				}
 
 				receive_packet_counter++;
@@ -177,7 +179,11 @@ void MOBILE<mobile_T>::print_mobile(){
 
 
 		mobile_file2 << std::fixed << std::setprecision(3) << sc_time_stamp().to_seconds();
-		mobile_file2 << std::fixed << std::setprecision(0) << "\t" << tuple_counter * TUPLE_SIZE + packet_counter * TRANSMIT_PACKET_SIZE + receive_packet_counter * RECEIVE_PACKET_SIZE + image_counter * IMAGE_SIZE << endl; // "\ttc: " << tuple_counter << "\tpc: " << packet_counter << "\trpc: " << receive_packet_counter << "\tic: " << image_counter << "\tcurrentImage: " << currentImageIndex << endl;
+		mobile_file2 << std::fixed << std::setprecision(0) << "\t" << (tuple_counter * TUPLE_SIZE) +
+			(packet_counter * TRANSMIT_PACKET_SIZE) +
+			(receive_packet_counter * SERVER_TO_MOBILE_PACKET_10MB) << endl;
+																	//(image_counter * IMAGE_SIZE) << endl;
+		//"\ttc: " << tuple_counter << "\tpc: " << packet_counter << "\trpc: " << receive_packet_counter << "\tic: " << image_counter << "\tcurrentImage: " << currentImageIndex << endl;
 	}
 
 	/*cout << endl << "======Tuple ARRAY in Mobile " << *(_mobile_id) << "=======" << endl;

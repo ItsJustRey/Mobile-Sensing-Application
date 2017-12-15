@@ -70,8 +70,11 @@ public:
 		MOBILE_MEMORY_FILE_NAME = "mobile" + to_string(*_mobile_id) + "_memory_file.txt";
 		mobile_file1.open(MOBILE_TRAFFIC_FILE_NAME);
 		mobile_file2.open(MOBILE_MEMORY_FILE_NAME);
-		bandwidth = BANDWIDTH_1MBS;
-		RECEIVE_PACKET_SIZE = SERVER_TO_MOBILE_PACKET_1MB;
+
+
+
+		bandwidth = BANDWIDTH_5MBS;
+		RECEIVE_PACKET_SIZE = SERVER_TO_MOBILE_PACKET_10MB;
 		transmission_time = RECEIVE_PACKET_SIZE / bandwidth;
 
 		cout << "CREATING MOBILE..." << "\tName: " << name << endl;

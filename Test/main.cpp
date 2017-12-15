@@ -98,7 +98,7 @@ int sc_main(int argc, char *argv[]){
 	mobile2.start_transmission_out(start_transmission_sig[2]);			// SERVER <-- MOBILE[i]
 	mobile2.receive_new_image_in(new_image_sig[2]);						// SERVER --> MOBILE[i]
 	mobile2.image_transmitted_done_in(image_transmitted_done_sig[2]);	// SERVER --> MOBILE[i]
-	sc_start(200, SC_SEC);
+	sc_start(300, SC_SEC);
 
 	return 0;
 }
